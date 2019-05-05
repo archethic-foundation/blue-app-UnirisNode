@@ -346,8 +346,7 @@ static const bagl_element_t *io_seproxyhal_touch_exit(const bagl_element_t *e) {
     return NULL; // do not redraw the widget
 }
 
-static const bagl_element_t*
-io_seproxyhal_touch_approve(const bagl_element_t *e) {
+static const bagl_element_t *io_seproxyhal_touch_approve(const bagl_element_t *e) {
     unsigned int tx = 0;
     // Update the hash
     cx_hash(&hash.header, 0, G_io_apdu_buffer + 5, G_io_apdu_buffer[4], NULL);
