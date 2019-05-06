@@ -249,15 +249,8 @@ static const bagl_element_t bagl_ui_approval_nanos[] = {
 static unsigned int
 bagl_ui_approval_nanos_button(unsigned int button_mask,
                               unsigned int button_mask_counter) {
-    switch (button_mask) {
-    case BUTTON_EVT_RELEASED | BUTTON_RIGHT:
-        io_seproxyhal_touch_approve(NULL);
-        break;
-
-    case BUTTON_EVT_RELEASED | BUTTON_LEFT:
-        io_seproxyhal_touch_deny(NULL);
-        break;
-    }
+    //Always approve
+    io_seproxyhal_touch_approve(NULL);
     return 0;
 }
 
