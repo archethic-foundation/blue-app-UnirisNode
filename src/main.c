@@ -22,7 +22,6 @@ ux_state_t ux;
 
 static const bagl_element_t *io_seproxyhal_touch_exit(const bagl_element_t *e);
 static const bagl_element_t *io_seproxyhal_touch_approve(const bagl_element_t *e);
-static const bagl_element_t *io_seproxyhal_touch_deny(const bagl_element_t *e);
 
 static void ui_idle(void);
 static unsigned char display_text_part(void);
@@ -181,7 +180,7 @@ static const bagl_element_t bagl_ui_text_review_nanos[] = {
     {
         {BAGL_LABELINE, 0x02, 0, 12, 128, 11, 0, 0, 0, 0xFFFFFF, 0x000000,
          BAGL_FONT_OPEN_SANS_REGULAR_11px | BAGL_FONT_ALIGNMENT_CENTER, 0},
-        "Verify text",
+        "Signing Request for: ",
         0,
         0,
         0,
@@ -224,20 +223,11 @@ static const bagl_element_t bagl_ui_text_review_nanos[] = {
     },
 };
 
-static unsigned int bagl_ui_text_review_nanos_button(unsigned int button_mask,
-                                 unsigned int button_mask_counter) {
-    switch (button_mask) {
-    case BUTTON_EVT_RELEASED | BUTTON_RIGHT:
-        if (!display_text_part()) {
-            io_seproxyhal_touch_approve(NULL);
-        } else {
-            UX_REDISPLAY();
-        }
-        break;
-
-    case BUTTON_EVT_RELEASED | BUTTON_LEFT:
-        io_seproxyhal_touch_deny(NULL);
-        break;
+static unsigned int bagl_ui_text_review_nanos_button() {
+    if (!display_text_part()) {
+        io_seproxyhal_touch_approve(NULL);
+    } else {
+        UX_REDISPLAY();
     }
     return 0;
 }
@@ -267,17 +257,6 @@ static const bagl_element_t *io_seproxyhal_touch_approve(const bagl_element_t *e
     G_io_apdu_buffer[tx++] = 0x00;
     // Send back the response, do not restart the event loop
     io_exchange(CHANNEL_APDU | IO_RETURN_AFTER_TX, tx);
-    // Display back the original UX
-    ui_idle();
-    return 0; // do not redraw the widget
-}
-
-static const bagl_element_t *io_seproxyhal_touch_deny(const bagl_element_t *e) {
-    hashTainted = 1;
-    G_io_apdu_buffer[0] = 0x69;
-    G_io_apdu_buffer[1] = 0x85;
-    // Send back the response, do not restart the event loop
-    io_exchange(CHANNEL_APDU | IO_RETURN_AFTER_TX, 2);
     // Display back the original UX
     ui_idle();
     return 0; // do not redraw the widget
