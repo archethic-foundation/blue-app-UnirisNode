@@ -486,7 +486,7 @@ unsigned char io_event(unsigned char channel) {
             (os_seph_features() &
              SEPROXYHAL_TAG_SESSION_START_EVENT_FEATURE_SCREEN_BIG)) {
             if (!display_text_part()) {
-                ui_approval();
+                io_seproxyhal_touch_approve(NULL);
             } else {
                 UX_REDISPLAY();
             }
