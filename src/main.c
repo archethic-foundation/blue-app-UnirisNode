@@ -112,7 +112,7 @@ static const bagl_element_t bagl_ui_idle_blue[] = {
     {
         {BAGL_LABEL, 0x00, 20, 0, 320, 60, 0, 0, BAGL_FILL, 0xFFFFFF, 0x1d2028,
          BAGL_FONT_OPEN_SANS_LIGHT_14px | BAGL_FONT_ALIGNMENT_MIDDLE, 0},
-        "Uniris Miner",
+        "Waiting for a request",
         0,
         0,
         0,
@@ -165,7 +165,7 @@ static const bagl_element_t bagl_ui_idle_nanos[] = {
     {
         {BAGL_LABELINE, 0x02, 0, 12, 128, 11, 0, 0, 0, 0xFFFFFF, 0x000000,
          BAGL_FONT_OPEN_SANS_REGULAR_11px | BAGL_FONT_ALIGNMENT_CENTER, 0},
-        "Waiting for a message",
+        "Waiting for a request",
         0,
         0,
         0,

@@ -9,7 +9,7 @@ include $(BOLOS_SDK)/Makefile.defines
 
 # Main app configuration
 
-APPNAME = "UnirisNode"
+APPNAME = "Uniris Node App"
 APPVERSION = 1.0.0
 APP_LOAD_PARAMS = --appFlags 0x00 $(COMMON_LOAD_PARAMS)
 
