@@ -14,15 +14,14 @@ static unsigned int text_y;           // current location of the displayed text
 static unsigned char hashTainted;     // notification to restart the hash
 
 // UI currently displayed
-enum UI_STATE { UI_IDLE, UI_TEXT, UI_APPROVAL };
+enum UI_STATE { UI_IDLE, UI_TEXT };
 
 enum UI_STATE uiState;
 
 ux_state_t ux;
 
 static const bagl_element_t *io_seproxyhal_touch_exit(const bagl_element_t *e);
-static const bagl_element_t*
-io_seproxyhal_touch_approve(const bagl_element_t *e);
+static const bagl_element_t *io_seproxyhal_touch_approve(const bagl_element_t *e);
 static const bagl_element_t *io_seproxyhal_touch_deny(const bagl_element_t *e);
 
 static void ui_idle(void);
@@ -50,40 +49,6 @@ static char lineBuffer[50];
 static cx_sha256_t hash;
 
 #ifdef TARGET_BLUE
-
-// UI to approve or deny the signature proposal
-static const bagl_element_t const bagl_ui_approval_blue[] = {
-    {
-        {BAGL_BUTTON | BAGL_FLAG_TOUCHABLE, 0x00, 190, 215, 120, 40, 0, 6,
-         BAGL_FILL, 0x41ccb4, 0xF9F9F9, BAGL_FONT_OPEN_SANS_LIGHT_14px |
-         BAGL_FONT_ALIGNMENT_CENTER | BAGL_FONT_ALIGNMENT_MIDDLE, 0},
-        "Deny",
-        0,
-        0x37ae99,
-        0xF9F9F9,
-        io_seproxyhal_touch_deny,
-        NULL,
-        NULL,
-    },
-    {
-        {BAGL_BUTTON | BAGL_FLAG_TOUCHABLE, 0x00, 190, 265, 120, 40, 0, 6,
-         BAGL_FILL, 0x41ccb4, 0xF9F9F9, BAGL_FONT_OPEN_SANS_LIGHT_14px |
-         BAGL_FONT_ALIGNMENT_CENTER | BAGL_FONT_ALIGNMENT_MIDDLE, 0},
-        "Approve",
-        0,
-        0x37ae99,
-        0xF9F9F9,
-        io_seproxyhal_touch_approve,
-        NULL,
-        NULL,
-    },
-};
-
-static unsigned int
-bagl_ui_approval_blue_button(unsigned int button_mask,
-                             unsigned int button_mask_counter) {
-    return 0;
-}
 
 // UI displayed when no signature proposal has been received
 static const bagl_element_t bagl_ui_idle_blue[] = {
@@ -199,60 +164,7 @@ bagl_ui_idle_nanos_button(unsigned int button_mask,
     return 0;
 }
 
-static const bagl_element_t bagl_ui_approval_nanos[] = {
-    {
-        {BAGL_RECTANGLE, 0x00, 0, 0, 128, 32, 0, 0, BAGL_FILL, 0x000000,
-         0xFFFFFF, 0, 0},
-        NULL,
-        0,
-        0,
-        0,
-        NULL,
-        NULL,
-        NULL,
-    },
-    {
-        {BAGL_LABELINE, 0x02, 0, 12, 128, 11, 0, 0, 0, 0xFFFFFF, 0x000000,
-         BAGL_FONT_OPEN_SANS_REGULAR_11px | BAGL_FONT_ALIGNMENT_CENTER, 0},
-        "Sign message",
-        0,
-        0,
-        0,
-        NULL,
-        NULL,
-        NULL,
-    },
-    {
-        {BAGL_ICON, 0x00, 3, 12, 7, 7, 0, 0, 0, 0xFFFFFF, 0x000000, 0,
-         BAGL_GLYPH_ICON_CROSS},
-        NULL,
-        0,
-        0,
-        0,
-        NULL,
-        NULL,
-        NULL,
-    },
-    {
-        {BAGL_ICON, 0x00, 117, 13, 8, 6, 0, 0, 0, 0xFFFFFF, 0x000000, 0,
-         BAGL_GLYPH_ICON_CHECK},
-        NULL,
-        0,
-        0,
-        0,
-        NULL,
-        NULL,
-        NULL,
-    },
-};
 
-static unsigned int
-bagl_ui_approval_nanos_button(unsigned int button_mask,
-                              unsigned int button_mask_counter) {
-    //Always approve
-    io_seproxyhal_touch_approve(NULL);
-    return 0;
-}
 
 static const bagl_element_t bagl_ui_text_review_nanos[] = {
     {
@@ -312,13 +224,12 @@ static const bagl_element_t bagl_ui_text_review_nanos[] = {
     },
 };
 
-static unsigned int
-bagl_ui_text_review_nanos_button(unsigned int button_mask,
+static unsigned int bagl_ui_text_review_nanos_button(unsigned int button_mask,
                                  unsigned int button_mask_counter) {
     switch (button_mask) {
     case BUTTON_EVT_RELEASED | BUTTON_RIGHT:
         if (!display_text_part()) {
-            ui_approval();
+            io_seproxyhal_touch_approve(NULL);
         } else {
             UX_REDISPLAY();
         }
@@ -553,15 +464,6 @@ static void ui_text(void) {
     UX_DISPLAY(bagl_ui_text, NULL);
 #else
     UX_DISPLAY(bagl_ui_text_review_nanos, NULL);
-#endif
-}
-
-static void ui_approval(void) {
-    uiState = UI_APPROVAL;
-#ifdef TARGET_BLUE
-    UX_DISPLAY(bagl_ui_approval_blue, NULL);
-#else
-    UX_DISPLAY(bagl_ui_approval_nanos, NULL);
 #endif
 }
 
