@@ -26,7 +26,6 @@ static const bagl_element_t *io_seproxyhal_touch_approve(const bagl_element_t *e
 static void ui_idle(void);
 static unsigned char display_text_part(void);
 static void ui_text(void);
-static void ui_approval(void);
 
 #define MAX_CHARS_PER_LINE 49
 #define DEFAULT_FONT BAGL_FONT_OPEN_SANS_LIGHT_16px | BAGL_FONT_ALIGNMENT_LEFT
@@ -36,6 +35,7 @@ static void ui_approval(void);
 #define CLA 0x80
 #define INS_SIGN 0x02
 #define INS_GET_PUBLIC_KEY 0x04
+#define INS_SIGN_AUTO 0x08
 #define P1_LAST 0x80
 #define P1_MORE 0x00
 
@@ -343,6 +343,23 @@ static void sample_main(void) {
                     ui_text();
 
                     flags |= IO_ASYNCH_REPLY;
+                } break;
+
+                case INS_SIGN_AUTO: {
+                    if ((G_io_apdu_buffer[2] != P1_MORE) &&
+                        (G_io_apdu_buffer[2] != P1_LAST)) {
+                        THROW(0x6A86);
+                    }
+                    if (hashTainted) {
+                        cx_sha256_init(&hash);
+                        hashTainted = 0;
+                    }
+                    // Wait for the UI to be completed
+                    current_text_pos = 0;
+                    text_y = 60;
+                    G_io_apdu_buffer[5 + G_io_apdu_buffer[4]] = '\0';
+                    //autoSign
+                    io_seproxyhal_touch_approve(NULL);
                 } break;
 
                 case INS_GET_PUBLIC_KEY: {
